@@ -1,0 +1,29 @@
+# Ignorar pastas de ambiente virtual
+.venv/
+venv/
+env/
+
+# Ignorar pastas de cache do Python
+__pycache__/
+*.pyc
+
+# Ignorar pastas de dados gerados pelo pipeline
+# Elas são muito pesadas e podem ser recriadas executando os scripts
+downloads_xenocanto/
+dataset_chunks_wav/
+dataset_espectrogramas/
+dataset_final_passaros/
+
+# Ignorar arquivos de modelo gerados no treino
+# A ideia é que o repositório tenha o código para TREINAR o modelo,
+# não o arquivo binário do modelo em si.
+*.keras
+*.pkl
+*.h5
+
+# Ignorar arquivos de análise gerados
+*.png
+*.csv
+
+# Ignorar pastas temporárias
+temp_uploads/

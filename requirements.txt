@@ -1,0 +1,20 @@
+# Data Pipeline & Core
+requests
+tqdm
+pandas
+scikit-learn
+librosa
+soundfile
+numpy
+audiomentations
+matplotlib
+seaborn
+
+# Model Pipeline
+tensorflow
+joblib
+
+# Service
+fastapi
+uvicorn[standard]
+python-multipart
