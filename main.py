@@ -19,6 +19,7 @@ def run_command(command, cwd):
 def run_data_pipeline():
     print(">>> INICIANDO PIPELINE DE DADOS <<<")
     data_pipeline_dir = PROJECT_ROOT / "data_pipeline"
+    # Removemos a geração de espectrogramas do fluxo principal
     scripts = ["download_data.py", "preprocess_audio.py"]
     for script in scripts:
         run_command([script], cwd=data_pipeline_dir)

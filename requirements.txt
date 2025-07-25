@@ -13,6 +13,7 @@ seaborn
 # Model Pipeline
 tensorflow
 joblib
+keras-tuner
 
 # Service
 fastapi

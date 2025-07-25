@@ -1,12 +1,3 @@
-Com certeza\! Preparar um arquivo de instruções claro e separado é uma ótima ideia para compartilhar o projeto.
-
-Crie um arquivo na raiz do seu projeto chamado `INSTRUCOES.md` e cole o conteúdo abaixo nele. O formato Markdown é ideal porque pode ser lido facilmente em qualquer editor de texto e fica com uma ótima formatação em plataformas como GitHub, GitLab, etc.
-
------
-
-### **Arquivo: `classificador_passaros/INSTRUCOES.md`**
-
-````markdown
 # Guia de Execução do Projeto Classificador de Pássaros
 
 ## 1. Introdução
@@ -31,9 +22,9 @@ Siga estas etapas para configurar o ambiente do projeto.
 
 Abra seu terminal, navegue até a pasta onde deseja salvar o projeto e execute o comando abaixo:
 ```bash
-git clone https://github.com/VictorCPena/classificacao-passaros
+git clone <URL_DO_SEU_REPOSITORIO_GIT>
 ```
-
+*Substitua `<URL_DO_SEU_REPOSITORIO_GIT>` pela URL correta do seu projeto.*
 
 ### Passo 2: Acessar a Pasta do Projeto
 
@@ -69,69 +60,75 @@ pip install -r requirements.txt
 
 ## 4. Executando o Projeto
 
-Agora que tudo está instalado, você pode executar os diferentes fluxos de trabalho do projeto usando o script `main.py`.
+O fluxo de trabalho do projeto é dividido em duas fases principais e independentes: **1. Treinamento** e **2. Serviço (API)**.
 
-### Opção A: Execução Completa (Recomendado para o primeiro uso)
+Primeiro, você executa o processo de treinamento, que é computacionalmente intensivo e só precisa ser feito uma vez para cada modelo. Este processo gera os arquivos de modelo salvos. Depois, com os modelos já treinados, você pode iniciar o serviço da API a qualquer momento. A API é leve e rápida, pois apenas carrega o modelo pronto para fazer predições.
 
-Este comando executa todo o pipeline de uma só vez: baixa os dados, prepara, extrai características e treina o modelo que você escolher.
+Todos os comandos são executados a partir da raiz do projeto (`classificador_passaros/`).
 
-* **Para rodar tudo e treinar a CNN no final:**
+### FASE 1: TREINAMENTO (Processo pesado, feito uma única vez por modelo)
+
+**Opção A: Rodar tudo de uma vez (Recomendado para o primeiro uso)**
+
+Este comando executa todo o pipeline de dados e, ao final, treina o modelo especificado.
+
+* **Para gerar tudo e treinar a CNN:**
     ```bash
     python main.py run_all --model cnn
     ```
-* **Para rodar tudo e treinar o SVM no final:**
+* **Para gerar tudo e treinar o SVM:**
     ```bash
     python main.py run_all --model svm
     ```
-* **Para rodar tudo e treinar o Random Forest no final:**
+* **Para gerar tudo e treinar o Random Forest:**
     ```bash
     python main.py run_all --model random_forest
     ```
 
----
-### Opção B: Execução por Etapas (Para controle granular)
+**Opção B: Rodar por Etapas (Para mais controle)**
 
-Se preferir executar cada parte do processo separadamente, siga a ordem abaixo.
-
-* **Etapa 1: Coletar e Preparar Dados**
-    * Este comando baixa os áudios do Xeno-canto, cria os chunks e gera os espectrogramas para a CNN.
+1.  **Coletar e Preparar Dados:**
+    * Este comando baixa os áudios, cria os chunks e gera os espectrogramas.
     ```bash
     python main.py data
     ```
 
-* **Etapa 2: Extrair Características para Modelos Clássicos**
+2.  **Extrair Características para Modelos Clássicos:**
     * *(Requer que a Etapa 1 tenha sido executada)*
-    * Este comando cria o arquivo `audio_features.csv` com os MFCCs para o SVM e o Random Forest.
+    * Este comando cria o arquivo `audio_features.csv` com os MFCCs. É necessário **apenas** se você for treinar o SVM ou o Random Forest.
     ```bash
     python main.py extract_features
     ```
 
-* **Etapa 3: Treinar um Modelo Específico**
+3.  **Treinar um Modelo Específico:**
     * *(Requer que as etapas anteriores correspondentes tenham sido executadas)*
-    * **Para treinar a CNN:**
+    * **Para a CNN:**
         ```bash
         python main.py train --model cnn
         ```
-    * **Para treinar o SVM (com otimização):**
+    * **Para o SVM (com otimização):**
         ```bash
         python main.py train --model svm
         ```
-    * **Para treinar o Random Forest:**
+    * **Para o Random Forest:**
         ```bash
         python main.py train --model random_forest
         ```
 
 ---
-### Opção C: Iniciar a API de Predição
+### FASE 2: SERVIÇO E PREDIÇÃO (Processo leve, executado a qualquer momento)
 
-Este comando inicia um servidor web local para que você possa enviar novos áudios e receber a classificação da espécie em tempo real.
+Uma vez que a **CNN foi treinada (FASE 1)** e o arquivo `modelo_passaros_finetuned.keras` foi salvo na pasta `service/`, você pode iniciar a API para fazer predições em tempo real.
 
-* *(Requer que o modelo CNN tenha sido treinado - `python main.py train --model cnn`)*
+1.  **Iniciar o Servidor da API:**
     ```bash
     python main.py serve
     ```
-* O terminal mostrará que o servidor está rodando em `http://127.0.0.1:8000`.
-* Para testar, abra **outro terminal** e use o seguinte comando `curl` (substitua pelo caminho de um arquivo de áudio .mp3 ou .wav):
+    *O terminal ficará ocupado, mostrando que o servidor está no ar em `http://127.0.0.1:8000`. Para parar o servidor, pressione `CTRL+C`.*
+
+2.  **Testar a API:**
+    * Abra um **novo terminal** (deixe o servidor rodando no primeiro) e use o comando abaixo para enviar um arquivo de áudio e receber a previsão da espécie.
+    * *Substitua `/caminho/para/seu/audio.mp3` por um caminho real de um arquivo de áudio em sua máquina.*
     ```bash
     curl -X POST -F "file=@/caminho/para/seu/audio.mp3" [http://127.0.0.1:8000/predict/](http://127.0.0.1:8000/predict/)
     ```
@@ -143,8 +140,8 @@ Após a execução dos scripts, você verá novos arquivos e pastas sendo criado
 * **Na pasta `model_pipeline/`:**
     * `audio_features.csv`: O arquivo com os MFCCs.
     * Modelos salvos: `svm_model_tuned.pkl`, `random_forest_model.pkl`.
-    * Gráficos de análise: `random_forest_feature_importance.png`.
+    * Arquivos de suporte: `scaler.pkl`, `label_encoder.pkl`.
+    * Gráficos de análise: `random_forest_feature_importance.png`, `matriz_confusao_cnn.png`.
 * **Na pasta `service/`:**
     * O modelo da CNN treinado: `modelo_passaros_finetuned.keras`.
     * O mapeamento de classes: `class_names.json`.
-````

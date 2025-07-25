@@ -1,3 +1,4 @@
+# data_pipeline/03_generate_spectrograms.py
 import os
 import shutil
 import librosa
@@ -10,11 +11,12 @@ from config import CHUNKS_DIR, SPECTROGRAMS_DIR, N_MELS, FMAX, IMG_DPI
 def gerar_espectrograma(caminho_audio, caminho_saida):
     try:
         y, sr = librosa.load(caminho_audio, sr=None)
-        if len(y) < 2048: return False 
+        if len(y) < 2048: return False # Evita erro em áudios muito curtos
 
         S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=N_MELS, fmax=FMAX)
         S_db = librosa.power_to_db(S, ref=np.max)
         
+        # Salva a imagem sem eixos/bordas
         fig = plt.figure(figsize=[1, 1], dpi=IMG_DPI)
         ax = plt.Axes(fig, [0., 0., 1., 1.])
         ax.set_axis_off()

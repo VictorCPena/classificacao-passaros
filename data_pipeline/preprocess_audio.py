@@ -30,8 +30,9 @@ def chunk_and_augment_audios(input_dir, output_dir, chunk_duration, target_chunk
         os.makedirs(species_chunk_dir, exist_ok=True)
         chunks_count = 0
         
+        # Loop até atingir o número alvo de chunks
         while chunks_count < target_chunks:
-            audio_path = random.choice(audio_files)
+            audio_path = random.choice(audio_files) # Pega um áudio aleatório da espécie
             try:
                 y, sr = librosa.load(audio_path, sr=None)
                 chunk_samples = int(chunk_duration * sr)
@@ -41,6 +42,7 @@ def chunk_and_augment_audios(input_dir, output_dir, chunk_duration, target_chunk
                 chunk_data = y[start_sample : start_sample + chunk_samples]
                 original_filename = os.path.splitext(os.path.basename(audio_path))[0]
                 
+                # Salva o chunk original e os aumentados
                 for i in range(1 + num_augmentations):
                     if chunks_count >= target_chunks: break
                     

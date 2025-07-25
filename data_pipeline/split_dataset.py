@@ -23,6 +23,7 @@ def main():
         print(f"ERRO: A pasta de espectrogramas '{SPECTROGRAMS_DIR}' não foi encontrada.")
         return
 
+    # Mapeia cada imagem à sua espécie e gravação original (grupo)
     mapa_dados = []
     for r, _, fs in os.walk(SPECTROGRAMS_DIR):
         for f in fs:
@@ -30,7 +31,7 @@ def main():
                 mapa_dados.append({
                     "caminho_imagem": os.path.join(r, f),
                     "especie": os.path.basename(r),
-                    "grupo_gravacao": f.split('_chunk')[0]
+                    "grupo_gravacao": f.split('_chunk')[0] # Ex: 'XC12345'
                 })
     df = pd.DataFrame(mapa_dados)
     if df.empty:
@@ -39,11 +40,13 @@ def main():
 
     train_files, test_files = [], []
     
+    # Itera sobre cada espécie para garantir a estratificação
     for especie in tqdm(df['especie'].unique(), desc="Dividindo espécies"):
         df_especie = df[df['especie'] == especie]
         grupos_unicos = df_especie['grupo_gravacao'].unique()
         
-
+        # Se houver menos de 2 gravações originais, a divisão por grupo não funciona.
+        # Usa uma divisão aleatória simples como fallback.
         if len(grupos_unicos) < 2:
             imagens_especie = df_especie['caminho_imagem'].tolist()
             random.shuffle(imagens_especie)
@@ -51,12 +54,15 @@ def main():
             train_files.extend(imagens_especie[:ponto_divisao])
             test_files.extend(imagens_especie[ponto_divisao:])
         else:
+            # Usa no máximo 5 splits (padrão 80/20) ou o número de grupos se for menor
             n_splits = min(5, len(grupos_unicos))
             sgkf = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=RANDOM_STATE)
+            # Pega o primeiro split gerado
             train_idx, test_idx = next(sgkf.split(df_especie, df_especie['especie'], df_especie['grupo_gravacao']))
             train_files.extend(df_especie.iloc[train_idx]['caminho_imagem'].tolist())
             test_files.extend(df_especie.iloc[test_idx]['caminho_imagem'].tolist())
     
+    # Cria as pastas de treino e teste finais
     organizar_arquivos(train_files, os.path.join(FINAL_DATASET_DIR, "train"))
     organizar_arquivos(test_files, os.path.join(FINAL_DATASET_DIR, "test"))
     

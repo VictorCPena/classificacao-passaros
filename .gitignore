@@ -27,3 +27,5 @@ dataset_final_passaros/
 
 # Ignorar pastas temporárias
 temp_uploads/
+
+keras_tuner_dir/

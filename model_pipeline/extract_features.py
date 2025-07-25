@@ -8,13 +8,16 @@ import warnings
 
 warnings.filterwarnings('ignore', category=UserWarning)
 
+# Diretório relativo ao local do script
 CHUNKS_DIR = "../dataset_chunks_wav"
-OUTPUT_CSV_FILE = "audio_features.csv" 
+OUTPUT_CSV_FILE = "audio_features.csv" # Salva na mesma pasta do script
 
 def extract_features(file_path):
     try:
         y, sr = librosa.load(file_path, sr=None)
+        # Extrai 40 coeficientes MFCC
         mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40)
+        # Tira a média de cada coeficiente ao longo do tempo para ter um vetor de tamanho fixo
         mfccs_mean = np.mean(mfccs, axis=1)
         return mfccs_mean
     except Exception as e:
